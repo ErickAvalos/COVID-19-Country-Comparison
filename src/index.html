@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>COVID-19 Comparison</title>
+  </head>
+  <body>
+    <form>
+      <select name="country1" id="country1"></select>
+      <select name="country2" id="country2"></select>
+    </form>
+    <button onclick="onSubmit()">Submit</button>
+    <script>
+
+      // populate dropdown menus from API
+      async function populateDD() {
+        const stuff = await fetch("https://api.covid19api.com/countries");
+        const dropdown = await stuff.json();
+        document.getElementById("country1").innerHTML = "";
+        for (let i = 0; i < dropdown.length; i++) {
+          document.getElementById("country1").innerHTML +=
+            "<option value=" +
+            dropdown[i].Slug +
+            ">" +
+            dropdown[i].Country +
+            "</option>";
+        }
+        document.getElementById("country2").innerHTML = "";
+        for (let i = 0; i < dropdown.length; i++) {
+          document.getElementById("country2").innerHTML +=
+            "<option value=" +
+            dropdown[i].Slug +
+            ">" +
+            dropdown[i].Country +
+            "</option>";
+        }
+      }
+
+      //extract country data from API
+      async function onSubmit() {
+        const slug = document.getElementById("country1").value;
+        console.log(slug);
+        const result = await fetch(
+          "https://api.covid19api.com/total/country/" + slug
+        );
+        const data = await result.json();
+        let latestData = data[data.length - 1];
+        let confirmed = latestData.Confirmed;
+        let deaths = latestData.Deaths;
+        let recovered = latestData.Recovered;
+        let active = latestData.Active;
+        console.log(confirmed);
+        console.log(deaths);
+        console.log(recovered);
+        console.log(active);
+
+        const slug2 = document.getElementById("country2").value;
+        console.log(slug2);
+        const result2 = await fetch(
+          "https://api.covid19api.com/total/country/" + slug2
+        );
+        const data2 = await result2.json();
+        let latestData2 = data2[data2.length - 1];
+        let confirmed2 = latestData2.Confirmed;
+        let deaths2 = latestData2.Deaths;
+        let recovered2 = latestData2.Recovered;
+        let active2 = latestData2.Active;
+        console.log(confirmed2);
+        console.log(deaths2);
+        console.log(recovered2);
+        console.log(active2);
+      }
+
+      populateDD();
+    </script>
+  </body>
+</html>
