@@ -3,18 +3,22 @@ body {
   font-size: 15px;
   color: #000;
   background: #fff;
+  background-color: #93c1db;
 }
 
 h1 {
   font-size: 50px;
   text-align: center;
-  background: #e8e8e8;
+  color: #fff;
 }
 
 h3 {
   font-size: 22px;
 }
 
+canvas {
+    background-color: #fff;
+}
 #form {
     padding: auto;
     margin: 0 auto;
