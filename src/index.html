@@ -2,19 +2,28 @@
 <html>
   <head>
     <title>COVID-19 Comparison</title>
+    <link rel="stylesheet" href="style.css" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>
   </head>
   <body>
-    <form>
-      <select name="country1" id="country1"></select>
-      <select name="country2" id="country2"></select>
-    </form>
-    <button onclick="onSubmit()">Submit</button>
+    <h1>COVID-19 Two Country Comparison</h1>
+    <div id="chart">
+      <canvas id="myChart" width="500" height="150"></canvas>
+    </div>
+    <div id="form">
+      <form>
+        <select name="country1" id="country1"></select>
+        <select name="country2" id="country2"></select>
+      </form>
+      <br>
+      <button id="b1" onclick="onSubmit()">Submit</button>
+    </div>
     <script>
-
+      var myChart;
       // populate dropdown menus from API
       async function populateDD() {
-        const stuff = await fetch("https://api.covid19api.com/countries");
-        const dropdown = await stuff.json();
+        const countryList = await fetch("https://api.covid19api.com/countries");
+        const dropdown = await countryList.json();
         document.getElementById("country1").innerHTML = "";
         for (let i = 0; i < dropdown.length; i++) {
           document.getElementById("country1").innerHTML +=
@@ -37,6 +46,12 @@
 
       //extract country data from API
       async function onSubmit() {
+        var show = document.getElementById("chart");
+        show.style.display = "block";
+        if (myChart) {
+          myChart.destroy();
+        }
+        //first dropdown selection
         const slug = document.getElementById("country1").value;
         console.log(slug);
         const result = await fetch(
@@ -44,6 +59,23 @@
         );
         const data = await result.json();
         let latestData = data[data.length - 1];
+
+        //second dropdown selection
+        const slug2 = document.getElementById("country2").value;
+        console.log(slug2);
+        const result2 = await fetch(
+          "https://api.covid19api.com/total/country/" + slug2
+        );
+        const data2 = await result2.json();
+        let latestData2 = data2[data2.length - 1];
+
+        drawChart(latestData, latestData2);
+      }
+
+      async function drawChart(latestData, latestData2) {
+        // ctx = ctx.clearRect(0, 0, ctx.width, ctx.height);
+
+        //country #1 results
         let confirmed = latestData.Confirmed;
         let deaths = latestData.Deaths;
         let recovered = latestData.Recovered;
@@ -53,13 +85,7 @@
         console.log(recovered);
         console.log(active);
 
-        const slug2 = document.getElementById("country2").value;
-        console.log(slug2);
-        const result2 = await fetch(
-          "https://api.covid19api.com/total/country/" + slug2
-        );
-        const data2 = await result2.json();
-        let latestData2 = data2[data2.length - 1];
+        //country #2 results
         let confirmed2 = latestData2.Confirmed;
         let deaths2 = latestData2.Deaths;
         let recovered2 = latestData2.Recovered;
@@ -68,6 +94,61 @@
         console.log(deaths2);
         console.log(recovered2);
         console.log(active2);
+
+        var ctx = document.getElementById("myChart").getContext("2d");
+        myChart = new Chart(ctx, {
+          type: "bar",
+          data: {
+            labels: ["Confirmed", "Deaths", "Recovered", "Active"],
+            datasets: [
+              {
+                label: document.getElementById("country1").value,
+                data: [confirmed, deaths, recovered, active],
+                backgroundColor: [
+                  "rgba(255, 99, 132, 0.2)",
+                  "rgba(255, 99, 132, 0.2)",
+                  "rgba(255, 99, 132, 0.2)",
+                  "rgba(255, 99, 132, 0.2)",
+                ],
+                borderColor: [
+                  "rgba(255, 99, 132, 1)",
+                  "rgba(255, 99, 132, 1)",
+                  "rgba(255, 99, 132, 1)",
+                  "rgba(255, 99, 132, 1)",
+                ],
+                borderWidth: 1,
+              },
+              {
+                label: document.getElementById("country2").value,
+                data: [confirmed2, deaths2, recovered2, active2],
+                backgroundColor: [
+                  "rgba(255, 206, 86, 0.2)",
+                  "rgba(255, 206, 86, 0.2)",
+                  "rgba(255, 206, 86, 0.2)",
+                  "rgba(255, 206, 86, 0.2)",
+                ],
+                borderColor: [
+                  "rgba(255, 206, 86, 1)",
+                  "rgba(255, 206, 86, 1)",
+                  "rgba(255, 206, 86, 1)",
+                  "rgba(255, 206, 86, 1)",
+                ],
+                borderWidth: 1,
+              },
+            ],
+          },
+          options: {
+            scales: {
+              yAxes: [
+                {
+                  ticks: {
+                    beginAtZero: true,
+                  },
+                },
+              ],
+            },
+          },
+        });
       }
 
       populateDD();
