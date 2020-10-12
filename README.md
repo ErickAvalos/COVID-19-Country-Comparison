@@ -10,6 +10,7 @@ Select both desired countries from dropdown menus and click "Submit".
 
 * [COVID19API](https://covid19api.com/) - The API used for COVID19 data
 * [chart.js](https://www.chartjs.org/) - Charting library
+* [Bootstrap](https://getbootstrap.com/) - CSS framework
 
 ## Known Issues
 

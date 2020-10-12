@@ -1,30 +1,76 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>COVID-19 Comparison</title>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, shrink-to-fit=no"
+    />
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+      integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z"
+      crossorigin="anonymous"
+    />
     <link rel="stylesheet" href="style.css" />
     <script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>
+    <title>COVID-19 Comparison</title>
   </head>
   <body>
     <h1>COVID-19 Two Country Comparison</h1>
-    <div id="chart">
-      <canvas id="myChart" width="500" height="150"></canvas>
-    </div>
     <div id="form">
       <form>
-        <select name="country1" id="country1"></select>
-        <select name="country2" id="country2"></select>
+        <div class="form-group">
+          <label for="exampleFormControlSelect1">Select first country:</label>
+          <select class="form-control" id="country1"></select>
+          <label for="exampleFormControlSelect1">Select second country:</label>
+          <select class="form-control" id="country2"></select>
+        </div>
       </form>
-      <br>
-      <button id="b1" onclick="onSubmit()">Submit</button>
+      <button type="button" class="btn btn-dark" id="b1" onclick="onSubmit()">
+        Submit
+      </button>
     </div>
+
+    <div id="summary">
+      <div id="c1">
+        <div class="card text-white bg-dark mb-3" style="max-width: 18rem">
+          <div id="header1" class="card-header"></div>
+          <div class="card-body">
+            <p id="con1" class="card-text"></p>
+            <p id="death1" class="card-text"></p>
+            <p id="rec1" class="card-text"></p>
+            <p id="act1" class="card-text"></p>
+          </div>
+        </div>
+      </div>
+
+      <div id="c2">
+        <div class="card text-white bg-dark mb-3" style="max-width: 18rem">
+          <div id="header2" class="card-header"></div>
+          <div class="card-body">
+            <p id="con2" class="card-text"></p>
+            <p id="death2" class="card-text"></p>
+            <p id="rec2" class="card-text"></p>
+            <p id="act2" class="card-text"></p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="chart">
+      <canvas id="myChart" width="800" height="205"></canvas>
+    </div>
+
     <script>
       var myChart;
       // populate dropdown menus from API
       async function populateDD() {
         const countryList = await fetch("https://api.covid19api.com/countries");
         const dropdown = await countryList.json();
-        document.getElementById("country1").innerHTML = "";
+
+        document.getElementById("country1").innerHTML =
+          "<option value=" + "USA" + " selected>USA</option>";
         for (let i = 0; i < dropdown.length; i++) {
           document.getElementById("country1").innerHTML +=
             "<option value=" +
@@ -33,7 +79,9 @@
             dropdown[i].Country +
             "</option>";
         }
-        document.getElementById("country2").innerHTML = "";
+
+        document.getElementById("country2").innerHTML =
+          "<option value=" + "Mexico" + " selected>Mexico</option>";
         for (let i = 0; i < dropdown.length; i++) {
           document.getElementById("country2").innerHTML +=
             "<option value=" +
@@ -44,10 +92,58 @@
         }
       }
 
-      //extract country data from API
+      // set USA and Mexico as default countries
+      async function defaultData() {
+        const slug = "united-states";
+        console.log(slug);
+        const result = await fetch(
+          "https://api.covid19api.com/total/country/" + slug
+        );
+        const data = await result.json();
+        let latestData = data[data.length - 1];
+
+        //second dropdown selection
+        const slug2 = "mexico";
+        console.log(slug2);
+        const result2 = await fetch(
+          "https://api.covid19api.com/total/country/" + slug2
+        );
+        const data2 = await result2.json();
+        let latestData2 = data2[data2.length - 1];
+
+        drawChart(latestData, latestData2);
+        fillCards(latestData, latestData2);
+      }
+
+      function fillCards(latestData, latestData2) {
+        let confirmed = latestData.Confirmed;
+        let deaths = latestData.Deaths;
+        let recovered = latestData.Recovered;
+        let active = latestData.Active;
+        document.getElementById("header1").innerHTML = document
+          .getElementById("country1")
+          .value.toUpperCase();
+        document.getElementById("con1").innerHTML = "Confirmed: " + confirmed;
+        document.getElementById("death1").innerHTML = "Deaths: " + deaths;
+        document.getElementById("rec1").innerHTML = "Recovered: " + recovered;
+        document.getElementById("act1").innerHTML = "Active: " + active;
+
+        //country #2 results
+        let confirmed2 = latestData2.Confirmed;
+        let deaths2 = latestData2.Deaths;
+        let recovered2 = latestData2.Recovered;
+        let active2 = latestData2.Active;
+        document.getElementById("header2").innerHTML = document
+          .getElementById("country2")
+          .value.toUpperCase();
+        document.getElementById("con2").innerHTML = "Confirmed: " + confirmed2;
+        document.getElementById("death2").innerHTML = "Deaths: " + deaths2;
+        document.getElementById("rec2").innerHTML = "Recovered: " + recovered2;
+        document.getElementById("act2").innerHTML = "Active: " + active2;
+      }
+
+      // extract country data from API
       async function onSubmit() {
-        var show = document.getElementById("chart");
-        show.style.display = "block";
         if (myChart) {
           myChart.destroy();
         }
@@ -70,11 +166,10 @@
         let latestData2 = data2[data2.length - 1];
 
         drawChart(latestData, latestData2);
+        fillCards(latestData, latestData2);
       }
 
-      async function drawChart(latestData, latestData2) {
-        // ctx = ctx.clearRect(0, 0, ctx.width, ctx.height);
-
+      function drawChart(latestData, latestData2) {
         //country #1 results
         let confirmed = latestData.Confirmed;
         let deaths = latestData.Deaths;
@@ -105,16 +200,16 @@
                 label: document.getElementById("country1").value,
                 data: [confirmed, deaths, recovered, active],
                 backgroundColor: [
-                  "rgba(255, 99, 132, 0.2)",
-                  "rgba(255, 99, 132, 0.2)",
-                  "rgba(255, 99, 132, 0.2)",
-                  "rgba(255, 99, 132, 0.2)",
+                  "rgba(187, 134, 252, 0.2)",
+                  "rgba(187, 134, 252, 0.2)",
+                  "rgba(187, 134, 252, 0.2)",
+                  "rgba(187, 134, 252, 0.2)",
                 ],
                 borderColor: [
-                  "rgba(255, 99, 132, 1)",
-                  "rgba(255, 99, 132, 1)",
-                  "rgba(255, 99, 132, 1)",
-                  "rgba(255, 99, 132, 1)",
+                  "rgba(187, 134, 252, 1)",
+                  "rgba(187, 134, 252, 1)",
+                  "rgba(187, 134, 252, 1)",
+                  "rgba(187, 134, 252, 1)",
                 ],
                 borderWidth: 1,
               },
@@ -122,25 +217,41 @@
                 label: document.getElementById("country2").value,
                 data: [confirmed2, deaths2, recovered2, active2],
                 backgroundColor: [
-                  "rgba(255, 206, 86, 0.2)",
-                  "rgba(255, 206, 86, 0.2)",
-                  "rgba(255, 206, 86, 0.2)",
-                  "rgba(255, 206, 86, 0.2)",
+                  "rgba(3, 218, 198, 0.2)",
+                  "rgba(3, 218, 198, 0.2)",
+                  "rgba(3, 218, 198, 0.2)",
+                  "rgba(3, 218, 198, 0.2)",
                 ],
                 borderColor: [
-                  "rgba(255, 206, 86, 1)",
-                  "rgba(255, 206, 86, 1)",
-                  "rgba(255, 206, 86, 1)",
-                  "rgba(255, 206, 86, 1)",
+                  "rgba(3, 218, 198, 1)",
+                  "rgba(3, 218, 198, 1)",
+                  "rgba(3, 218, 198, 1)",
+                  "rgba(3, 218, 198, 1)",
                 ],
                 borderWidth: 1,
               },
             ],
-          }
+          },
         });
       }
 
+      defaultData();
       populateDD();
     </script>
+    <script
+      src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
+      integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"
+      integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"
+      integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shuf57BaghqFfPlYxofvL8/KUEfYiJOMMV+rV"
+      crossorigin="anonymous"
+    ></script>
   </body>
 </html>

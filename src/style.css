@@ -1,9 +1,9 @@
 body {
-  font-family: Georgia, Arial, Helvetica, Sans-serif, serif;
+  font-family: Arial, Helvetica, Sans-serif, serif;
   font-size: 15px;
   color: #000;
-  background: #fff;
-  background-color: #93c1db;
+  background-color: #000;
+  height: 100vh;
 }
 
 h1 {
@@ -17,20 +17,58 @@ h3 {
 }
 
 canvas {
-    background-color: #fff;
+    background-color: #121212;
 }
+
 #form {
-    padding: auto;
-    margin: 0 auto;
-    width: 800px;
+    display: block;
+    padding: 10px 10px;
+    margin: 10px auto;
+    width: 485px;
+    background-color: #121212;
+    border: 1px solid #343a40;
+    border-radius: 5px;
+    color: #fff;
+    font-size: 20px;
+}
+
+.form-inline {
+    justify-content: center;
 }
 
 #b1 {
-    padding: auto;
-    margin: 0 auto;
-    width: 100px;
+    display: block;
+    margin: 10px auto 0px;
 }
 
 #chart {
-    display: none;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0 auto;
+    width: 80%;
+}
+
+#summary {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 10px 0px 0px;
+    margin: 10px auto;
+}
+
+.card-body {
+    background-color: #121212;
+}
+
+#c1 {
+    min-width: 200px;
+    padding: auto;
+    margin: auto 40px auto auto;
+}
+
+#c2 {
+    min-width: 200px;
+    padding: auto;
+    margin: auto auto auto 40px;
 }
